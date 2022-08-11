@@ -20,6 +20,8 @@ import (
 	"github.com/gocql/gocql"
 )
 
+const ProdAstraURL = "https://api.astra.datastax.com"
+
 type Dialer struct {
 	sniProxyAddr      string
 	contactPoints     []string

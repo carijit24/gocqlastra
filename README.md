@@ -3,29 +3,49 @@
 This provides a custom host dialer that can be used to allow gocql to connect to DataStax Astra. The goal is to provide
 native support for gocql on Astra.
 
-The is currently very close to working, but there is one issue preventing connection.
-
 ## How to use it:
 
+Using an Astra bundle:
+
 ```go
-dialer, err = gocqlastra.NewDialerFromBundle("/path/to/your/bundle.zip", 10 * time.Second)
+cluster, err := gocqlastra.NewClusterFromBundle("/path/to/your/bundle.zip", "<username>", "<password>", 10 * time.Second)
 
 if err != nil {
-	panic("unable to load the bundle")
-}
-
-cluster := gocql.NewCluster("127.0.0.1")
-
-cluster.HostDialer = dialer
-cluster.PoolConfig = gocql.PoolConfig{HostSelectionPolicy: gocql.RoundRobinHostPolicy()}
-cluster.Authenticator = &gocql.PasswordAuthenticator{
-Username: cfg.Username,
-Password: cfg.Password,
+    panic("unable to load the bundle")
 }
 
 session, err := gocql.NewSession(*cluster)
 
 // ...
+```
+
+Using an Astra token:
+
+```go
+cluster, err = gocqlastra.NewClusterFromURL(gocqlastra.ProdAstraURL, "<astra-database-id>", "<astra-token>", 10 * time.Second)
+
+if err != nil {
+panic("unable to load the bundle")
+}
+
+session, err := gocql.NewSession(*cluster)
+
+// ...
+```
+
+Also, look at the (example)[example] for more information.
+
+### Running the example:
+
+```
+cd example
+go build
+
+# Using a bundle
+./example --astra-bundle /path/to/bundle.zip --username <username> --password <password>
+
+# Using a token
+./example --astra-token <astra-token> --astra-database-id <astra-database-id> 
 ```
 
 ### Issues

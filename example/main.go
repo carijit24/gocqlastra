@@ -34,9 +34,9 @@ func main() {
 		parser.Fatalf("error parsing flags: %v", err)
 	}
 
-	var dialer *gocqlastra.Dialer
+	var cluster *gocql.ClusterConfig
 	if len(cfg.AstraBundle) > 0 {
-		dialer, err = gocqlastra.NewDialerFromBundle(cfg.AstraBundle, cfg.AstraTimeout)
+		cluster, err = gocqlastra.NewClusterFromBundle(cfg.AstraBundle, cfg.Username, cfg.Password, cfg.AstraTimeout)
 		if err != nil {
 			cliCtx.Fatalf("unable to open bundle %s from file: %v", cfg.AstraBundle, err)
 		}
@@ -44,28 +44,12 @@ func main() {
 		if len(cfg.AstraDatabaseID) == 0 {
 			cliCtx.Fatalf("database ID is required when using a token")
 		}
-		dialer, err = gocqlastra.NewDialerFromURL(cfg.AstraApiURL, cfg.AstraDatabaseID, cfg.AstraToken, cfg.AstraTimeout)
-
+		cluster, err = gocqlastra.NewClusterFromURL(cfg.AstraApiURL, cfg.AstraDatabaseID, cfg.AstraToken, cfg.AstraTimeout)
 		if err != nil {
 			cliCtx.Fatalf("unable to load bundle %s from astra: %v", cfg.AstraBundle, err)
 		}
-		cfg.Username = "token"
-		cfg.Password = cfg.AstraToken
 	} else {
 		cliCtx.Fatalf("must provide either bundle path or token")
-	}
-
-	cluster := gocql.NewCluster("127.0.0.1")
-
-	cluster.ConnectTimeout = 20 * time.Second
-	cluster.ProtoVersion = 4
-	cluster.Timeout = 20 * time.Second
-
-	cluster.HostDialer = dialer
-	cluster.PoolConfig = gocql.PoolConfig{HostSelectionPolicy: gocql.RoundRobinHostPolicy()}
-	cluster.Authenticator = &gocql.PasswordAuthenticator{
-		Username: cfg.Username,
-		Password: cfg.Password,
 	}
 
 	start := time.Now()
@@ -75,7 +59,7 @@ func main() {
 		log.Fatalf("unable to connect session: %v", err)
 	}
 
-	iter := session.Query("SELECT version FROM system.local").Iter()
+	iter := session.Query("SELECT release_version FROM system.local").Iter()
 
 	var version string
 	for iter.Scan(&version) {
