@@ -1,4 +1,4 @@
-# gocql for Astra
+# gocql for Astra (prototype)
 
 This provides a custom `gocql.HostDialer` that can be used to allow gocql to connect to DataStax Astra. The goal is to
 provide native support for gocql on Astra.
