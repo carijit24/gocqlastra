@@ -22,7 +22,7 @@ import (
 
 const AstraAPIURL = "https://api.astra.datastax.com"
 
-type Dialer struct {
+type dialer struct {
 	sniProxyAddr      string   // Don't use directly
 	contactPoints     []string // Don't use directly
 	contactPointIndex int32
@@ -32,29 +32,29 @@ type Dialer struct {
 	timeout           time.Duration
 }
 
-func NewDialerFromBundle(path string, timeout time.Duration) (*Dialer, error) {
+func NewDialerFromBundle(path string, timeout time.Duration) (gocql.HostDialer, error) {
 	bundle, err := astra.LoadBundleZipFromPath(path)
 	if err != nil {
 		return nil, err
 	}
-	return &Dialer{
+	return &dialer{
 		bundle:  bundle,
 		timeout: timeout,
 	}, nil
 }
 
-func NewDialerFromURL(url, databaseID, token string, timeout time.Duration) (*Dialer, error) {
+func NewDialerFromURL(url, databaseID, token string, timeout time.Duration) (gocql.HostDialer, error) {
 	bundle, err := astra.LoadBundleZipFromURL(url, databaseID, token, timeout)
 	if err != nil {
 		return nil, err
 	}
-	return &Dialer{
+	return &dialer{
 		bundle:  bundle,
 		timeout: timeout,
 	}, nil
 }
 
-func (d *Dialer) DialHost(ctx context.Context, host *gocql.HostInfo) (*gocql.DialedHost, error) {
+func (d *dialer) DialHost(ctx context.Context, host *gocql.HostInfo) (*gocql.DialedHost, error) {
 	sniAddr, contactPoints, err := d.resolveMetadata(ctx)
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func (d *Dialer) DialHost(ctx context.Context, host *gocql.HostInfo) (*gocql.Dia
 	}, nil
 }
 
-func (d *Dialer) resolveMetadata(ctx context.Context) (string, []string, error) {
+func (d *dialer) resolveMetadata(ctx context.Context) (string, []string, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
