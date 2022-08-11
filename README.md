@@ -25,7 +25,7 @@ session, err := gocql.NewSession(*cluster)
 Using an Astra token:
 
 ```go
-cluster, err = gocqlastra.NewClusterFromURL(gocqlastra.ProdAstraURL, 
+cluster, err = gocqlastra.NewClusterFromURL(gocqlastra.AstraAPIURL, 
 	"<astra-database-id>", "<astra-token>", 10 * time.Second)
 
 if err != nil {
