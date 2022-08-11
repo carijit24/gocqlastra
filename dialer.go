@@ -23,8 +23,8 @@ import (
 const AstraAPIURL = "https://api.astra.datastax.com"
 
 type Dialer struct {
-	sniProxyAddr      string
-	contactPoints     []string
+	sniProxyAddr      string   // Don't use directly
+	contactPoints     []string // Don't use directly
 	contactPointIndex int32
 	bundle            *astra.Bundle
 	dialer            net.Dialer
@@ -55,7 +55,7 @@ func NewDialerFromURL(url, databaseID, token string, timeout time.Duration) (*Di
 }
 
 func (d *Dialer) DialHost(ctx context.Context, host *gocql.HostInfo) (*gocql.DialedHost, error) {
-	sniAddr, err := d.resolveMetadata(ctx)
+	sniAddr, contactPoints, err := d.resolveMetadata(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (d *Dialer) DialHost(ctx context.Context, host *gocql.HostInfo) (*gocql.Dia
 
 	hostId := host.HostID()
 	if hostId == "" {
-		hostId = d.contactPoints[int(atomic.AddInt32(&d.contactPointIndex, 1))%len(d.contactPoints)]
+		hostId = contactPoints[int(atomic.AddInt32(&d.contactPointIndex, 1))%len(d.contactPoints)]
 	}
 
 	tlsConn := tls.Client(conn, copyTLSConfig(d.bundle, hostId))
@@ -87,13 +87,13 @@ func (d *Dialer) DialHost(ctx context.Context, host *gocql.HostInfo) (*gocql.Dia
 	}, nil
 }
 
-func (d *Dialer) resolveMetadata(ctx context.Context) (string, error) {
+func (d *Dialer) resolveMetadata(ctx context.Context) (string, []string, error) {
 	d.mu.Lock()
 	defer d.mu.Unlock()
 
 	// TODO: Make this value have a TTL
 	if d.sniProxyAddr != "" {
-		return d.sniProxyAddr, nil
+		return d.sniProxyAddr, d.contactPoints, nil
 	}
 
 	var metadata *astraMetadata
@@ -110,28 +110,28 @@ func (d *Dialer) resolveMetadata(ctx context.Context) (string, error) {
 	url := fmt.Sprintf("https://%s:%d/metadata", d.bundle.Host(), d.bundle.Port())
 	req, err := http.NewRequestWithContext(ctx, "GET", url, http.NoBody)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	response, err := httpsClient.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("unable to get Astra metadata from %s: %w", url, err)
+		return "", nil, fmt.Errorf("unable to get Astra metadata from %s: %w", url, err)
 	}
 
 	body, err := readAllWithTimeout(response.Body, ctx)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	err = json.Unmarshal(body, &metadata)
 	if err != nil {
-		return "", err
+		return "", nil, err
 	}
 
 	d.sniProxyAddr = metadata.ContactInfo.SniProxyAddress
 	d.contactPoints = metadata.ContactInfo.ContactPoints
 
-	return d.sniProxyAddr, err
+	return d.sniProxyAddr, d.contactPoints, err
 }
 
 func copyTLSConfig(bundle *astra.Bundle, serverName string) *tls.Config {
