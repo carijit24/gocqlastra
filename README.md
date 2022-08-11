@@ -59,5 +59,6 @@ go build
 ./example --astra-bundle /path/to/bundle.zip --username <username> --password <password>
 
 # Using a token
-./example --astra-token <astra-token> --astra-database-id <astra-database-id> 
+./example --astra-token <astra-token> --astra-database-id <astra-database-id> \
+  [--astra-api-url <astra-api-url>]
 ```
