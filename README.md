@@ -1,7 +1,7 @@
 # gocql for Astra
 
-This provides a custom host dialer that can be used to allow gocql to connect to DataStax Astra. The goal is to provide
-native support for gocql on Astra.
+This provides a custom `gocql.HostDialer` that can be used to allow gocql to connect to DataStax Astra. The goal is to
+provide native support for gocql on Astra.
 
 This library was made possible by the `gocql.HostDialer` interface added here: https://github.com/gocql/gocql/pull/1629
 
