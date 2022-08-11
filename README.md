@@ -58,3 +58,4 @@ go build
   system for Astra is returns `4.0.0.6816` for the `release_version` column, but it doesn't actually support Apache
   Cassandra 4.0 (which includes `system.peers_v2`).  This is currently using a hack that replaces the `HostInfo` 
   version with a custom `gocql.HostFilter`. See [hack.go](hack.go) for more information.
+* Need to verify that topology/status events correct update the driver when using Astra.
