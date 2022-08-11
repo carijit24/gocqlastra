@@ -8,7 +8,8 @@ native support for gocql on Astra.
 Using an Astra bundle:
 
 ```go
-cluster, err := gocqlastra.NewClusterFromBundle("/path/to/your/bundle.zip", "<username>", "<password>", 10 * time.Second)
+cluster, err := gocqlastra.NewClusterFromBundle("/path/to/your/bundle.zip", 
+	"<username>", "<password>", 10 * time.Second)
 
 if err != nil {
     panic("unable to load the bundle")
@@ -22,7 +23,8 @@ session, err := gocql.NewSession(*cluster)
 Using an Astra token:
 
 ```go
-cluster, err = gocqlastra.NewClusterFromURL(gocqlastra.ProdAstraURL, "<astra-database-id>", "<astra-token>", 10 * time.Second)
+cluster, err = gocqlastra.NewClusterFromURL(gocqlastra.ProdAstraURL, 
+	"<astra-database-id>", "<astra-token>", 10 * time.Second)
 
 if err != nil {
 panic("unable to load the bundle")
