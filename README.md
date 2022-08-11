@@ -33,7 +33,7 @@ session, err := gocql.NewSession(*cluster)
 // ...
 ```
 
-Also, look at the (example)[example] for more information.
+Also, look at the [example](example) for more information.
 
 ### Running the example:
 
@@ -52,8 +52,5 @@ go build
 
 * Astra uses Stargate which doesn't current support the system table `system.peers_v2`. Also, the underlying storage 
   system for Astra is returns `4.0.0.6816` for the `release_version` column, but it doesn't actually support Apache
-  Cassandra 4.0 (which includes `system.peers_v2`). When connecting you'll see the following error.
-  
-  ```
-  2022/08/11 12:29:38 unable to connect session: gocql: unable to create session: unable to fetch peer host info: table system.peers_v2 does not exist
-  ```
+  Cassandra 4.0 (which includes `system.peers_v2`).  This is currently using a hack that replaces the `HostInfo` 
+  version with a custom `gocql.HostFilter`. See [hack.go](hack.go) for more information.
