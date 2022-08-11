@@ -12,6 +12,8 @@ This library was made possible by the `gocql.HostDialer` interface added here: h
   Cassandra 4.0 (which includes `system.peers_v2`).  This is currently using a hack that replaces the `HostInfo` 
   version using a custom `gocql.HostFilter`. See [hack.go](hack.go) for more information.
 * Need to verify that topology/status events correctly update the driver when using Astra.
+* There is a bit of weirdness around contact points. I'm just using a place holder `"0.0.0.0"` (some valid IP address) 
+  then the `HostDialer` provides a host ID from the metadata service when the host ID in the `HostInfo` is empty.
 
 ## How to use it:
 
