@@ -83,7 +83,7 @@ func (d *dialer) DialHost(ctx context.Context, host *gocql.HostInfo) (*gocql.Dia
 
 	return &gocql.DialedHost{
 		Conn:            tlsConn,
-		DisableCoalesce: false,
+		DisableCoalesce: true, // See https://github.com/mpenick/gocqlastra/issues/1
 	}, nil
 }
 
