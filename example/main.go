@@ -39,7 +39,7 @@ func main() {
 
 	var cluster *gocql.ClusterConfig
 	if len(cfg.AstraBundle) > 0 {
-		cluster, err = gocqlastra.NewClusterFromBundle("/Users/arijit.chakraborty/go/src/github.com/riptano/gocqlastra/example/scb.zip", "IhLuIxdmnJTGqythGPLhTPtc", "3CMhoXZi9H4DYJjBqr.q-ns7z1GfEg5ZkoBS2f9i4zdhGESbsGK8HEtu6QRD5yEJ4_WCiHT0YcXjTPGgs8GIhQG40kajWr6ZZXPfYI,MUzTJhZZQYiHrbWbPheEsPsps", cfg.AstraTimeout)
+		cluster, err = gocqlastra.NewClusterFromBundle(cfg.AstraBundle, cfg.Username, cfg.Password, cfg.AstraTimeout)
 		if err != nil {
 			cliCtx.Fatalf("unable to open bundle %s from file: %v", cfg.AstraBundle, err)
 		}
