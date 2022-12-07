@@ -59,7 +59,7 @@ func main() {
 	var waitGroup sync.WaitGroup
 	waitGroup.Add(size)
 	for i := 0; i < size; i++ {
-		callAstra(i, err, cluster, &waitGroup)
+		go callAstra(i, err, cluster, &waitGroup)
 	}
 	waitGroup.Wait()
 }
